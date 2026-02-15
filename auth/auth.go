@@ -16,7 +16,7 @@ type System struct {
 	Users []User
 }
 
-// Manual Hex Conversion (Tanpa encoding/hex)
+// Manual Hex Conversion
 func ToHexString(bytes [16]byte) string {
 	const hexChars = "0123456789abcdef"
 	res := make([]byte, 32)
@@ -50,6 +50,7 @@ func HandleSystemError() {
 func (s *System) Register() {
 	for {
 		var fName, lName, email, pass, confirm, choice string
+
 		ClearScreen()
 		fmt.Println("--- Register ---")
 		fmt.Print("What is your first name: ")
@@ -64,7 +65,9 @@ func (s *System) Register() {
 		fmt.Scanln(&confirm)
 
 		fmt.Println("\nIs it true?")
-		fmt.Printf("First name: %s\nLast name: %s\nEmail: %s\n", fName, lName, email)
+		fmt.Printf("First name: %s\n", fName)
+		fmt.Printf("Last name: %s\n", lName)
+		fmt.Printf("Email: %s\n", email)
 		fmt.Print("Continue (y/n): ")
 		fmt.Scanln(&choice)
 
@@ -74,10 +77,13 @@ func (s *System) Register() {
 				WaitEnter()
 				continue
 			}
-			s.Users = append(s.Users, User{
-				FirstName: fName, LastName: lName,
-				Email: email, Password: EncryptMD5(pass),
-			})
+			newUser := User{
+				FirstName: fName,
+				LastName:  lName,
+				Email:     email,
+				Password:  EncryptMD5(pass),
+			}
+			s.Users = append(s.Users, newUser)
 			fmt.Print("Register success, press enter to back..")
 			WaitEnter()
 			break
@@ -122,7 +128,10 @@ func (s *System) ForgotPassword() {
 
 		found := -1
 		for i, u := range s.Users {
-			if u.Email == email { found = i; break }
+			if u.Email == email {
+				found = i
+				break
+			}
 		}
 
 		if found == -1 {
